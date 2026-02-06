@@ -21,9 +21,14 @@ public static class Api
 
     public class Context
     {
-        public Context(HttpContext http) => Http = http;
+        public Context(HttpContext http, Db db)
+        {
+            Http = http;
+            Db = db;
+        }
 
         public HttpContext Http { get; }
+        public Db Db { get; }
     }
 
     [ApiController, Route("api")]
@@ -31,6 +36,6 @@ public static class Api
     {
         Context? context;
 
-        protected Context Context => context ??= new Context(HttpContext);
+        protected Context Context => context ??= new Context(HttpContext, HttpContext.RequestServices.GetRequiredService<Db>());
     }
 }

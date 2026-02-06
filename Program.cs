@@ -6,7 +6,7 @@ namespace CookScores;
 
 public static class Program
 {
-    public static void Main(string[] args)
+    public static async Task<int> Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddControllers()
@@ -18,8 +18,16 @@ public static class Program
             })
             .ConfigureApiBehaviorOptions(o =>
                 o.InvalidModelStateResponseFactory = _ => new BadRequestObjectResult(new { error = "Invalid request" }));
+        builder.Services.AddSingleton(new Db(builder.Configuration.GetConnectionString("CookScores")
+            ?? throw new InvalidOperationException("Missing ConnectionStrings:CookScores - copy appsettings.example.json or run install.sh.")));
 
         var app = builder.Build();
+
+        if (args.Length > 0 && args[0] == "install")
+        {
+            await Install.Run(app.Services.GetRequiredService<Db>());
+            return 0;
+        }
 
         app.Use(async (ctx, next) =>
         {
@@ -39,6 +47,7 @@ public static class Program
         });
 
         Api.Map(app);
-        app.Run();
+        await app.RunAsync();
+        return 0;
     }
 }
