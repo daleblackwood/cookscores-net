@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,6 +13,9 @@ public class ApiError : Exception
 
 public static class Api
 {
+    public static readonly string Version =
+        typeof(Api).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
+
     public static string Now() => DateTimeOffset.Now.ToString("yyyy-MM-dd'T'HH:mm:sszzz");
 
     public static void Map(WebApplication app)

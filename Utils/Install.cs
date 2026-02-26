@@ -32,6 +32,9 @@ public static class Install
                 k VARCHAR(50) PRIMARY KEY,
                 v VARCHAR(255) NOT NULL
             );");
-        Console.WriteLine("cookscores installed.");
+        await db.Exec(@"
+            INSERT INTO meta (k, v) VALUES ('version', @version)
+            ON CONFLICT (k) DO UPDATE SET v = excluded.v", new { version = Api.Version });
+        Console.WriteLine($"cookscores {Api.Version} installed.");
     }
 }
